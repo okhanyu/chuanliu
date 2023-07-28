@@ -11,6 +11,7 @@ import (
 	"rsshub/dao/rss/model"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetRssDB() *gorm.DB {
@@ -151,6 +152,17 @@ func AddRss(param model.Rss) error {
 			tx.Rollback()
 		} else {
 			tx.Commit()
+		}
+	} else if param.Cover != "" && param.Cover != rssObj.Cover {
+		txUpdate := GetRssDBWithTx()
+		errUpdate := txUpdate.Model(&param).Where("link = ? ", param.Link).Updates(map[string]interface{}{
+			"update_time": time.Now(),
+			"cover":       param.Cover,
+		}).Error
+		if errUpdate != nil {
+			txUpdate.Rollback()
+		} else {
+			txUpdate.Commit()
 		}
 	}
 	return err

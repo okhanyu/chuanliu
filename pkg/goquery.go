@@ -118,6 +118,11 @@ func GetFirstImage(url string) (string, bool) {
 		Not("nav img").First()
 	//firstImg := doc.Find("body").Find("article").First().Not("header").Find("img").First()
 	src, exists := firstImg.Attr("src")
+	if !exists {
+		firstImg = doc.Find("body").Find("figure").First().Find("img").Not("header img").
+			Not("nav img").First()
+		src, exists = firstImg.Attr("src")
+	}
 	//if exists {
 	return src, exists
 	//}
