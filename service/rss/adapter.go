@@ -41,6 +41,7 @@ func DaoObjectToServiceObjectBatch(req []daoModel.GetRss) (result []serviceModel
 			UserName:   re.UserName,
 			Del:        re.Del,
 			Watch:      re.Watch,
+			Like:       re.Like,
 			Summary:    re.Summary,
 			CreateTime: re.CreateTime,
 			//CreateTimeShow: re.CreateTime.Format("2006-01-02 15:04:05"),

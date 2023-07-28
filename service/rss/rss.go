@@ -7,6 +7,14 @@ import (
 	"strings"
 )
 
+//var LikeIp map[string]map[int]int
+//
+//func init() {
+//	if LikeIp == nil {
+//		LikeIp = make(map[string]map[int]int)
+//	}
+//}
+
 func GetList(c *gin.Context, param model.GetListReq) ([]model.GetRss, error) {
 	rssDaoList, err := dao.GetRssList(c, ServiceReqToDaoReq(param))
 	if err != nil {
@@ -39,6 +47,14 @@ func GetTags(c *gin.Context, param model.GetTagsReq) ([]string, error) {
 
 func Watch(c *gin.Context, param int) error {
 	err := dao.Watch(c, param)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func Like(c *gin.Context, param int) error {
+	err := dao.Like(c, param)
 	if err != nil {
 		return err
 	}

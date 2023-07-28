@@ -11,6 +11,7 @@ type Rss struct {
 	Content     string
 	Link        string
 	Watch       int
+	Like        int
 	UserName    string
 	Tags        string
 	Del         int
@@ -27,6 +28,7 @@ type GetRss struct {
 	Content     string
 	Link        string
 	Watch       int
+	Like        int
 	UserName    string
 	Tags        string
 	Del         int

@@ -27,5 +27,6 @@ type UserStatistics struct {
 	UpdateTime  time.Time
 	Del         int
 	Watch       int
+	Like        int
 	Total       int
 }

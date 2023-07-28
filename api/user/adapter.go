@@ -28,6 +28,7 @@ func ServiceStatisticsObjectToApiStatisticsObjectBatch(res []serviceModel.UserSt
 			UpdateTime:  re.UpdateTime,
 			Del:         re.Del,
 			Total:       re.Total,
+			Like:        re.Like,
 			//CreateTimeShow: re.CreateTime.Format("2006-01-02 15:04:05"),
 			//CreateTimeShow: time.Unix(re.CreateTime, 0).Format("2006-01-02 15:04:05"),
 		})

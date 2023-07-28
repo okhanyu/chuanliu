@@ -43,6 +43,7 @@ func DaoStatisticsObjectToServiceStatisticsObjectBatch(req []daoModel.UserStatis
 			SiteTitle:   re.UserName,
 			SiteLink:    re.SiteLink,
 			Watch:       re.Watch,
+			Like:        re.Like,
 			Description: re.Description,
 			CreateTime:  re.CreateTime,
 			UpdateTime:  re.UpdateTime,

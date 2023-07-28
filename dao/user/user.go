@@ -26,8 +26,9 @@ func GetUserList() ([]model.User, error) {
 
 func GetUserListByGroup(param model.GetListReq) ([]model.UserStatistics, error) {
 	var userList []model.UserStatistics
-	selectField := fmt.Sprintf("%s.*, sum(%s.watch) as watch, count(%s.user_id) as total ", cons.TableUser,
-		cons.TableRss, cons.TableRss)
+	selectField := fmt.Sprintf("%s.*, sum(%s.watch) as watch, sum(%s.`like`) as `like`, count(%s.user_id) as total ",
+		cons.TableUser,
+		cons.TableRss, cons.TableRss, cons.TableRss)
 	join := fmt.Sprintf("LEFT JOIN %s ON %s.id = %s.user_id ", cons.TableRss, cons.TableUser, cons.TableRss)
 	group := fmt.Sprintf("%s.id", cons.TableUser)
 	where := fmt.Sprintf(" %s.del = 0 ", cons.TableUser)
@@ -41,6 +42,9 @@ func GetUserListByGroup(param model.GetListReq) ([]model.UserStatistics, error) 
 	}
 	if param.Order == 2 {
 		order = " watch desc "
+	}
+	if param.Order == 3 {
+		order = " `like` desc "
 	}
 	err := GetUserDB().Model(&userList).Select(selectField).Joins(join).Where(where).
 		Order(order).Group(group).Offset(param.PageNum * param.

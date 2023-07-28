@@ -71,6 +71,27 @@ func WatchArticle(c *gin.Context) {
 	gohelper_server.Success(c, "success")
 }
 
+func LikeArticle(c *gin.Context) {
+	var param model.LikeReq
+	//err := c.ShouldBindWith(&param, binding.JSON)
+	err := c.ShouldBindJSON(&param)
+	if err != nil && c.Request.ContentLength != 0 {
+		log.Printf("format param error is : %v", err)
+		gohelper_server.FailWithError(c, err)
+		c.Abort()
+		return
+	}
+
+	err = service.Like(c, param.Id)
+	if err != nil {
+		log.Printf("service error is : %v", err)
+		gohelper_server.FailWithError(c, err)
+		c.Abort()
+		return
+	}
+	gohelper_server.Success(c, "success")
+}
+
 func ListRssUserRecent(c *gin.Context) {
 	var param model.GetListReq
 	//err := c.ShouldBindWith(&param, binding.JSON)

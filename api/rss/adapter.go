@@ -32,6 +32,7 @@ func ServiceObjectToApiObjectBatch(res []serviceModel.GetRss) (result []apiModel
 			Tags:        re.Tags,
 			UserName:    re.UserName,
 			Watch:       re.Watch,
+			Like:        re.Like,
 			PubDate:     re.PubDate,
 			PubDateShow: re.PubDate.Format("2006-01-02 15:04:05"),
 			Cover:       re.Cover,

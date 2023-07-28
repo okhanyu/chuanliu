@@ -24,6 +24,7 @@ func StartHttpServer() {
 
 	Posts := make([]*gohelper_server.Router, 0)
 	Posts = append(Posts, gohelper_server.NewRouter(prefix, "rss/watch", []gin.HandlerFunc{rss.WatchArticle}))
+	Posts = append(Posts, gohelper_server.NewRouter(prefix, "rss/like", []gin.HandlerFunc{rss.LikeArticle}))
 
 	server := gohelper_server.GetServerInstance()
 	server.BuildGet(Gets).BuildPost(Posts).BuildUsesFunc(func(context *gin.Context) {

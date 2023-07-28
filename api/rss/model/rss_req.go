@@ -17,6 +17,10 @@ type WatchReq struct {
 	Id int `json:"id" form:"id"`
 }
 
+type LikeReq struct {
+	Id int `json:"id" form:"id"`
+}
+
 type GetTagsReq struct {
 	page.Page
 	Where int `json:"where" form:"where"`

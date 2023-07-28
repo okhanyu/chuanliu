@@ -50,6 +50,22 @@ func GetRssList(_ *gin.Context, param model.GetRssListReq) ([]model.GetRss, erro
 	if param.Order == 1 {
 		order = fmt.Sprintf("  watch DESC, %s ", order)
 	}
+
+	// 按照喜欢、发布时间倒序
+	if param.Order == 2 {
+		order = fmt.Sprintf("  `like` DESC, %s ", order)
+	}
+
+	// 按照观看量、喜欢、发布时间倒序
+	if param.Order == 3 {
+		order = fmt.Sprintf("   watch DESC, `like` DESC, %s ", order)
+	}
+
+	// 按照喜欢、观看量、发布时间倒序
+	if param.Order == 4 {
+		order = fmt.Sprintf("  `like` DESC,  watch DESC, %s ", order)
+	}
+
 	// 查找除热点外的其他文章
 	if param.Where == 1 {
 		where = fmt.Sprintf(" %s and %s.id not in (SELECT id FROM `%s` WHERE   del = 0  and DATETIME("+
@@ -60,9 +76,15 @@ func GetRssList(_ *gin.Context, param model.GetRssListReq) ([]model.GetRss, erro
 	if param.Where == 2 {
 		where = fmt.Sprintf(" %s and DATETIME(pub_date_time) >= DATETIME('now', '%s')", where, timeCondition)
 	}
+
 	// 查找有头图的文章
 	if param.Where == 3 {
 		where = fmt.Sprintf(" %s and cover != '' ", where)
+	}
+
+	// 查找全部文章
+	if param.Where == 4 {
+
 	}
 
 	if param.Tag != "" {
@@ -85,6 +107,19 @@ func Watch(_ *gin.Context, param int) error {
 	tx := GetRssDBWithTx()
 	err := tx.Model(&param).Where("id = ? and watch < ? ", param, math.MaxInt).
 		UpdateColumn("watch", gorm.Expr("watch + ?", 1)).Error
+	if err != nil {
+		tx.Rollback()
+	} else {
+		tx.Commit()
+	}
+	return err
+}
+
+// Like 增加喜欢
+func Like(_ *gin.Context, param int) error {
+	tx := GetRssDBWithTx()
+	err := tx.Model(&param).Where("id = ? and like < ? ", param, math.MaxInt).
+		UpdateColumn("like", gorm.Expr("like + ?", 1)).Error
 	if err != nil {
 		tx.Rollback()
 	} else {
@@ -121,6 +156,7 @@ func AddRss(param model.Rss) error {
 	return err
 }
 
+// GetUserRecentArticleListByGroup 每个用户最近3条
 func GetUserRecentArticleListByGroup(_ *gin.Context, param model.GetRssListReq) ([]model.UserRecentArticle, error) {
 	var userList []model.UserRecentArticle
 

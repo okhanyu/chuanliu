@@ -15,6 +15,7 @@ type UserStatistics struct {
 	Del         int       `json:"del" form:"del"`
 	Watch       int       `json:"watch" form:"watch"`
 	Total       int       `json:"total" form:"total"`
+	Like        int       `json:"like" form:"like"`
 }
 
 type User struct {

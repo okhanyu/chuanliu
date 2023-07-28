@@ -8,6 +8,7 @@ type Rss struct {
 	Summary    string
 	Link       string
 	Watch      int
+	Like       int
 	UserName   string
 	Tags       []string
 	Del        int
@@ -25,6 +26,7 @@ type GetRss struct {
 	Summary    string
 	Link       string
 	Watch      int
+	Like       int
 	UserName   string
 	Tags       []string
 	Del        int

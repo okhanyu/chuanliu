@@ -15,6 +15,7 @@ type UserStatistics struct {
 	Del         int
 	Watch       int
 	Total       int
+	Like        int
 }
 
 type User struct {
