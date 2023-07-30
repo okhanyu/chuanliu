@@ -35,7 +35,7 @@ func GetUserListByGroup(param model.GetListReq) ([]model.UserStatistics, error) 
 	order := " create_time desc "
 	if param.Where == 1 {
 		rankTime := config.GlobalConfig.SqlCondition[cons.RankTime]
-		where = fmt.Sprintf("%s and pub_date_time >= date('now', '%s') ", where, rankTime)
+		where = fmt.Sprintf("%s and pub_date_time >= (NOW() - INTERVAL %s )  ", where, rankTime)
 	}
 	if param.Order == 1 {
 		order = " total desc "

@@ -1,18 +1,19 @@
 notion:
-  token: 
+  token:
   version: 2022-06-28
   databases_url: https://api.notion.com/v1/databases/2fec78f26b59444aaf93ca71c8e62367/query
   memos_databases_url: https://api.notion.com/v1/databases/60e865cd74974ba9b6ed7b59c8979671/query
 
 system:
-  rss_get_timer: 5
-  notion_get_timer: 10
-  notion_memos_get_timer: 15
-  db: ./db/rss.db
+  rss_get_timer: 1800
+  notion_get_timer: 1200
+  notion_memos_get_timer: 1000
+  #db: ./db/rss.db
+  db:
   len: 1000 #摘要字数
   port: :8899
 
 sql_condition:
-  rands_time: -48 hours
+  rands_time: 48 HOUR
   rands_count: 3
-  rank_time: -30 days
+  rank_time: 30 DAY

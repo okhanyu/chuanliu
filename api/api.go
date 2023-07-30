@@ -7,6 +7,7 @@ import (
 	"rsshub/api/rss"
 	"rsshub/api/user"
 	"rsshub/config"
+	"rsshub/timer"
 )
 
 func StartHttpServer() {
@@ -21,6 +22,13 @@ func StartHttpServer() {
 	Gets = append(Gets, gohelper_server.NewRouter(prefix, "rss/tag/list", []gin.HandlerFunc{rss.ListRssTags}))
 	Gets = append(Gets, gohelper_server.NewRouter(prefix, "rss/user/list/recent",
 		[]gin.HandlerFunc{rss.ListRssUserRecent}))
+
+	Gets = append(Gets, gohelper_server.NewRouter(prefix, "task/user/execute",
+		[]gin.HandlerFunc{timer.GetUserTask}))
+	Gets = append(Gets, gohelper_server.NewRouter(prefix, "task/user/memos/execute",
+		[]gin.HandlerFunc{timer.GetMemosUserTask}))
+	Gets = append(Gets, gohelper_server.NewRouter(prefix, "task/rss/execute",
+		[]gin.HandlerFunc{timer.RssTask}))
 
 	Posts := make([]*gohelper_server.Router, 0)
 	Posts = append(Posts, gohelper_server.NewRouter(prefix, "rss/watch", []gin.HandlerFunc{rss.WatchArticle}))

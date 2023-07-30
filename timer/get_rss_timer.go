@@ -2,6 +2,8 @@ package timer
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/okhanyu/gohelper/gohelper_server"
 	"rsshub/config"
 	rssDao "rsshub/dao/rss"
 	rssModel "rsshub/dao/rss/model"
@@ -28,7 +30,7 @@ func GetRssTimer() {
 	go func() {
 		for range ticker.C {
 			fmt.Printf("[获取Rss定时任务执行开始 %v]\n", time.Now())
-			RssTask()
+			rssTask()
 			fmt.Printf("[获取Rss定时任务执行完毕 %v]\n", time.Now())
 		}
 	}()
@@ -37,7 +39,24 @@ func GetRssTimer() {
 	// fmt.Println("定时任务已停止")
 }
 
-func RssTask() {
+var rssExeFlag = true
+
+func RssTask(c *gin.Context) {
+	if rssExeFlag {
+		go func() {
+			rssExeFlag = false
+			fmt.Printf("[获取Rss主动任务执行开始 %v]\n", time.Now())
+			rssTask()
+			fmt.Printf("[获取Rss主动任务执行完毕 %v]\n", time.Now())
+			rssExeFlag = true
+		}()
+		gohelper_server.Success(c, "执行成功")
+	} else {
+		gohelper_server.Success(c, "任务正在执行中，本次不执行")
+	}
+}
+
+func rssTask() {
 	userList, err := userDao.GetUserList()
 	if err != nil {
 		return

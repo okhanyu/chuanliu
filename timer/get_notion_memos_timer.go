@@ -3,7 +3,9 @@ package timer
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/okhanyu/gohelper/gohelper_http"
+	"github.com/okhanyu/gohelper/gohelper_server"
 	"gorm.io/gorm"
 	"net/http"
 	"rsshub/config"
@@ -38,6 +40,24 @@ func GetNotionMemosTimer() {
 	// time.Sleep(5 * time.Second)
 	// ticker.Stop()
 	// fmt.Println("定时任务已停止")
+}
+
+var memosUserExeFlag = true
+
+func GetMemosUserTask(c *gin.Context) {
+	if memosUserExeFlag {
+		go func() {
+			memosUserExeFlag = false
+			fmt.Printf("[获取Notion Memos User主动任务执行开始 %v]\n", time.Now())
+			getMemosUserTask()
+			fmt.Printf("[获取Notion Memos User主动任务执行完毕 %v]\n", time.Now())
+			memosUserExeFlag = true
+		}()
+		gohelper_server.Success(c, "执行成功")
+	} else {
+		gohelper_server.Success(c, "任务正在执行中，本次不执行")
+	}
+
 }
 
 func getMemosUserTask() {

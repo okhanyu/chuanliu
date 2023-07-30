@@ -69,13 +69,14 @@ func GetRssList(_ *gin.Context, param model.GetRssListReq) ([]model.GetRss, erro
 
 	// 查找除热点外的其他文章
 	if param.Where == 1 {
-		where = fmt.Sprintf(" %s and %s.id not in (SELECT id FROM `%s` WHERE   del = 0  and DATETIME("+
-			"pub_date_time) >= DATETIME('now', '%s') ORDER BY  watch DESC,  pub_date_time desc   LIMIT %d) ",
+		where = fmt.Sprintf(" %s and %s.id not in (SELECT * FROM (SELECT id FROM `%s` WHERE   del = 0  and "+
+			"pub_date_time >= (NOW() - INTERVAL %s) ORDER BY  watch DESC,  "+
+			"pub_date_time desc   LIMIT %d ) AS subquery )",
 			where, cons.TableRss, cons.TableRss, timeCondition, randsCountInt)
 	}
 	// 查找热点文章
 	if param.Where == 2 {
-		where = fmt.Sprintf(" %s and DATETIME(pub_date_time) >= DATETIME('now', '%s')", where, timeCondition)
+		where = fmt.Sprintf(" %s and pub_date_time >= (NOW() - INTERVAL %s) ", where, timeCondition)
 	}
 
 	// 查找有头图的文章
@@ -89,7 +90,7 @@ func GetRssList(_ *gin.Context, param model.GetRssListReq) ([]model.GetRss, erro
 	}
 
 	if param.Tag != "" {
-		where = fmt.Sprintf(" %s and tags LIKE '%%%s%%' COLLATE NOCASE ", where, param.Tag)
+		where = fmt.Sprintf(" %s and tags LIKE '%%%s%%' ", where, param.Tag)
 	}
 	// join := fmt.Sprintf("JOIN %s ON %s.user_id = %s.id", user.TableUser, TableRss, user.TableUser)
 	// selectField := fmt.Sprintf("%s.*,%s.id as userId,%s.del as userDel", TableRss, user.TableUser, user.TableUser)
@@ -119,8 +120,8 @@ func Watch(_ *gin.Context, param int) error {
 // Like 增加喜欢
 func Like(_ *gin.Context, param int) error {
 	tx := GetRssDBWithTx()
-	err := tx.Model(&param).Where("id = ? and like < ? ", param, math.MaxInt).
-		UpdateColumn("like", gorm.Expr("like + ?", 1)).Error
+	err := tx.Model(&param).Where("id = ? and `like` < ? ", param, math.MaxInt).
+		UpdateColumn("like", gorm.Expr("`like` + ?", 1)).Error
 	if err != nil {
 		tx.Rollback()
 	} else {
@@ -176,7 +177,7 @@ func GetUserRecentArticleListByGroup(_ *gin.Context, param model.GetRssListReq) 
 		"min_pub_date_time  FROM %s LEFT JOIN ( SELECT t.user_id, "+
 		"( SELECT pub_date_time FROM %s WHERE user_id = t."+
 		"user_id ORDER BY pub_date_time DESC LIMIT 1 OFFSET 2 ) AS min_pub_date_time FROM ("+
-		"SELECT user_id AS user_id , pub_date_time FROM %s GROUP BY user_id "+
+		"SELECT user_id AS user_id  FROM %s GROUP BY user_id "+
 		") AS t ) AS jt ON jt.user_id = %s.user_id where %s.pub_date_time >= jt.min_pub_date_time  and %s.del != 1",
 		cons.TableRss, cons.TableRss, cons.TableRss, cons.TableRss, cons.TableRss,
 		cons.TableRss, cons.TableRss, cons.TableRss)
