@@ -1,10 +1,10 @@
 package pkg
 
 import (
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io"
 	"io/ioutil"
+	"log"
 	"strings"
 )
 
@@ -13,7 +13,7 @@ func GetOpenGraphImage(url string) (string, bool) {
 	response, err := HttpRequestRss(url)
 	//resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println("请求RSS失败:", err)
+		log.Println("请求RSS失败:", err)
 		return "", false
 	}
 
@@ -28,7 +28,7 @@ func GetOpenGraphImage(url string) (string, bool) {
 
 	doc, err := goquery.NewDocumentFromReader(readCloser)
 	if err != nil {
-		fmt.Println("解析HTML失败:", err)
+		log.Println("解析HTML失败:", err)
 		return "", false
 	}
 	content, exists := "", false
@@ -48,7 +48,7 @@ func GetContentImage(content string) (string, bool) {
 	// 使用goquery解析HTML
 	doc, err := goquery.NewDocumentFromReader(readCloser)
 	if err != nil {
-		fmt.Println("搜索content image失败:", err)
+		log.Println("搜索content image失败:", err)
 		return "", false
 	}
 
@@ -85,7 +85,7 @@ func GetFirstImage(url string) (string, bool) {
 	response, err := HttpRequestRss(url)
 	//resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println("请求RSS失败:", err)
+		log.Println("请求RSS失败:", err)
 		return "", false
 	}
 
@@ -101,7 +101,7 @@ func GetFirstImage(url string) (string, bool) {
 	// 使用goquery解析HTML
 	doc, err := goquery.NewDocumentFromReader(readCloser)
 	if err != nil {
-		fmt.Println("解析image失败:", err)
+		log.Println("解析image失败:", err)
 		return "", false
 	}
 

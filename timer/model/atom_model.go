@@ -36,7 +36,7 @@ type Entry struct {
 }
 
 type Category struct {
-	//Term string `xml:"term,attr"`
+	Term  string `xml:"term,attr"`
 	Value string `xml:",chardata"`
 }
 

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/okhanyu/gohelper/gohelper_server"
+	"golang.org/x/text/encoding/unicode"
+	"log"
 	"rsshub/config"
 	rssDao "rsshub/dao/rss"
 	rssModel "rsshub/dao/rss/model"
@@ -29,14 +31,14 @@ func GetRssTimer() {
 	ticker := time.NewTicker(time.Duration(timeSetting) * time.Second)
 	go func() {
 		for range ticker.C {
-			fmt.Printf("[获取Rss定时任务执行开始 %v]\n", time.Now())
+			log.Printf("[获取Rss定时任务执行开始 %v]\n", time.Now())
 			rssTask()
-			fmt.Printf("[获取Rss定时任务执行完毕 %v]\n", time.Now())
+			log.Printf("[获取Rss定时任务执行完毕 %v]\n", time.Now())
 		}
 	}()
 	// time.Sleep(5 * time.Second)
 	// ticker.Stop()
-	// fmt.Println("定时任务已停止")
+	// log.Println("定时任务已停止")
 }
 
 var rssExeFlag = true
@@ -45,9 +47,9 @@ func RssTask(c *gin.Context) {
 	if rssExeFlag {
 		go func() {
 			rssExeFlag = false
-			fmt.Printf("[获取Rss主动任务执行开始 %v]\n", time.Now())
+			log.Printf("[获取Rss主动任务执行开始 %v]\n", time.Now())
 			rssTask()
-			fmt.Printf("[获取Rss主动任务执行完毕 %v]\n", time.Now())
+			log.Printf("[获取Rss主动任务执行完毕 %v]\n", time.Now())
 			rssExeFlag = true
 		}()
 		gohelper_server.Success(c, "执行成功")
@@ -63,6 +65,9 @@ func rssTask() {
 	}
 
 	for _, userObj := range userList {
+		//if userObj.RssLink != "https://demochen.com/atom.xml" {
+		//	continue
+		//}
 		rssLink := userObj.RssLink
 		rssContent, atomResult, err := pkg.ParseRss(rssLink)
 		if err != nil {
@@ -90,9 +95,19 @@ func eachRss(rssContent *model.Rss, userObj userModel.User) []rssModel.Rss {
 		cate := ""
 		for i, s := range item.Categories {
 			if i > 0 {
-				cate = fmt.Sprintf("%s,%s", cate, s.Value)
+				cate = fmt.Sprintf("%s,%s", cate, func() string {
+					if s.Value == "" {
+						return s.Term
+					}
+					return s.Value
+				}())
 			} else {
-				cate = s.Value
+				cate = func() string {
+					if s.Value == "" {
+						return s.Term
+					}
+					return s.Value
+				}()
 			}
 		}
 		pubDate, _ := pkg.PubDateTimeConvert(item.PubDate)
@@ -131,10 +146,19 @@ func eachRss(rssContent *model.Rss, userObj userModel.User) []rssModel.Rss {
 		//	UserId:      userObj.Id,
 		//	CreateTime:  time.Now(),
 		//})
+		// 设置字符编码转换器
+		encoder := unicode.UTF8.NewEncoder()
+		// 进行字符编码转换
+		encodedContent, err := encoder.String(item.Content)
+		encodedTitle, err := encoder.String(item.Title)
+
+		if err != nil {
+			log.Println("Failed to encode string:", err)
+		}
 		rssDao.AddRss(rssModel.Rss{
-			Title:       item.Title,
+			Title:       encodedTitle,
 			Summary:     item.Description,
-			Content:     item.Content,
+			Content:     encodedContent,
 			Link:        item.Link,
 			PubDateTime: pubDate,
 			UserName:    userName,
@@ -154,10 +178,22 @@ func eachAtom(atomResult *model.Feed, userObj userModel.User) []rssModel.Rss {
 		for i, s := range item.Category {
 			s.Value = strings.ReplaceAll(s.Value, "\n", "")
 			s.Value = strings.TrimSpace(s.Value)
+			s.Term = strings.TrimSpace(s.Term)
+			s.Term = strings.ReplaceAll(s.Term, "\n", "")
 			if i > 0 {
-				cate = fmt.Sprintf("%s,%s", cate, s.Value)
+				cate = fmt.Sprintf("%s,%s", cate, func() string {
+					if s.Value == "" {
+						return s.Term
+					}
+					return s.Value
+				}())
 			} else {
-				cate = s.Value
+				cate = func() string {
+					if s.Value == "" {
+						return s.Term
+					}
+					return s.Value
+				}()
 			}
 		}
 		if item.Published == "" {
@@ -203,10 +239,26 @@ func eachAtom(atomResult *model.Feed, userObj userModel.User) []rssModel.Rss {
 		//	UserId:      userObj.Id,
 		//	CreateTime:  time.Now(),
 		//})
+
+		// 设置字符编码转换器
+		encoder := unicode.UTF8.NewEncoder()
+		// 进行字符编码转换
+		encodedContent, err := encoder.String(item.Content.Value)
+		if err != nil {
+			log.Println("Failed to encode string:", err)
+		}
+		encodedSummary, err := encoder.String(item.Summary)
+		if err != nil {
+			log.Println("Failed to encode string:", err)
+		}
+		encodedTitle, err := encoder.String(item.Title)
+		if err != nil {
+			log.Println("Failed to encode string:", err)
+		}
 		rssDao.AddRss(rssModel.Rss{
-			Title:       item.Title,
-			Summary:     item.Summary,
-			Content:     item.Content.Value,
+			Title:       encodedTitle,
+			Summary:     encodedSummary,
+			Content:     encodedContent,
 			Link:        urlLink,
 			PubDateTime: pubDate,
 			UserName:    userName,

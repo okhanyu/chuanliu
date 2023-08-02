@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"log"
 	"math"
 	"rsshub/config"
 	"rsshub/dao/cons"
@@ -35,6 +36,10 @@ func GetTags(_ *gin.Context, param model.GetTagsReq) ([]string, error) {
 func GetRssList(_ *gin.Context, param model.GetRssListReq) ([]model.GetRss, error) {
 	var rssList []model.GetRss
 
+	if param.PageSize > 50 {
+		param.PageSize = 50
+	}
+
 	order := " pub_date_time desc "
 	where := fmt.Sprintf(" %s.del = 0 and %s.user_id in ( select id as user_id from %s where del = 0 )  ",
 		cons.TableRss, cons.TableRss, cons.TableUser)
@@ -43,9 +48,9 @@ func GetRssList(_ *gin.Context, param model.GetRssListReq) ([]model.GetRss, erro
 	randsCount := config.GlobalConfig.SqlCondition[cons.RandsCount]
 	randsCountInt, err := strconv.Atoi(randsCount)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		randsCountInt = 3
-		fmt.Println("randsCountInt降级为3")
+		log.Println("randsCountInt降级为3")
 	}
 	// 按照观看量、发布时间倒序
 	if param.Order == 1 {

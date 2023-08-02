@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"rsshub/api"
 	"rsshub/config"
 	"rsshub/dao/db"
@@ -14,7 +14,7 @@ var dbDsn = "./db/rss.db"
 func main() {
 	config.InitConfig()
 	dbDsn = config.GlobalConfig.System["db"]
-	fmt.Printf("db: %s", dbDsn)
+	log.Printf("db: %s", dbDsn)
 	db.InitDB(dbDsn)
 	timer.GetNotionTimer()
 	timer.GetRssTimer()

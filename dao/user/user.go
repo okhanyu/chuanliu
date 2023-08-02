@@ -87,7 +87,7 @@ func UpdateUser(param model.User) error {
 	//	RssLink: param.RssLink,
 	//})
 	//if userObj.RssLink == "" {
-	//	fmt.Println("user信息不存在，无法更新")
+	//	log.Println("user信息不存在，无法更新")
 	//	return errors.New("user信息不存在，无法更新")
 	//}
 	tx := GetUserDBWithTx()

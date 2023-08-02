@@ -7,6 +7,7 @@ import (
 	"github.com/okhanyu/gohelper/gohelper_http"
 	"github.com/okhanyu/gohelper/gohelper_server"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"rsshub/config"
 	memosUserDao "rsshub/dao/memos"
@@ -27,19 +28,19 @@ func GetNotionMemosTimer() {
 	timeConfigInt, err := strconv.Atoi(timeConfig)
 	if err != nil {
 		timeConfigInt = 1200
-		fmt.Printf("无法读取和转换配置中获取NOTION数据的时间，使用降级值：%d", timeConfigInt)
+		log.Printf("无法读取和转换配置中获取NOTION数据的时间，使用降级值：%d", timeConfigInt)
 	}
 	ticker := time.NewTicker(time.Duration(timeConfigInt) * time.Second)
 	go func() {
 		for range ticker.C {
-			fmt.Printf("[获取Notion Memos定时任务执行开始 %v]\n", time.Now())
+			log.Printf("[获取Notion Memos定时任务执行开始 %v]\n", time.Now())
 			getMemosUserTask()
-			fmt.Printf("[获取Notion Memos定时任务执行完毕 %v]\n", time.Now())
+			log.Printf("[获取Notion Memos定时任务执行完毕 %v]\n", time.Now())
 		}
 	}()
 	// time.Sleep(5 * time.Second)
 	// ticker.Stop()
-	// fmt.Println("定时任务已停止")
+	// log.Println("定时任务已停止")
 }
 
 var memosUserExeFlag = true
@@ -48,9 +49,9 @@ func GetMemosUserTask(c *gin.Context) {
 	if memosUserExeFlag {
 		go func() {
 			memosUserExeFlag = false
-			fmt.Printf("[获取Notion Memos User主动任务执行开始 %v]\n", time.Now())
+			log.Printf("[获取Notion Memos User主动任务执行开始 %v]\n", time.Now())
 			getMemosUserTask()
-			fmt.Printf("[获取Notion Memos User主动任务执行完毕 %v]\n", time.Now())
+			log.Printf("[获取Notion Memos User主动任务执行完毕 %v]\n", time.Now())
 			memosUserExeFlag = true
 		}()
 		gohelper_server.Success(c, "执行成功")
@@ -73,15 +74,15 @@ func getMemosUserTask() {
 		nil,
 		"")
 	if err != nil {
-		fmt.Printf("请求NOTION失败: %v", err)
+		log.Printf("请求NOTION失败: %v", err)
 		return
 	}
 
-	fmt.Printf("请求NOTION成功: %s", notionDatabasesUrl)
+	log.Printf("请求NOTION成功: %s", notionDatabasesUrl)
 	response := timerModel.Result{}
 	err = json.Unmarshal([]byte(getNotionResult), &response)
 	if err != nil {
-		fmt.Printf("解析NOTION结果失败: %v", err)
+		log.Printf("解析NOTION结果失败: %v", err)
 		return
 	}
 

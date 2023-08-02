@@ -6,7 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/okhanyu/gohelper/gohelper_http"
 	"github.com/okhanyu/gohelper/gohelper_server"
+	"golang.org/x/text/encoding/unicode"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"rsshub/config"
 	userDao "rsshub/dao/user"
@@ -32,19 +34,19 @@ func GetNotionTimer() {
 	timeConfigInt, err := strconv.Atoi(timeConfig)
 	if err != nil {
 		timeConfigInt = 1200
-		fmt.Printf("无法读取和转换配置中获取NOTION数据的时间，使用降级值：%d", timeConfigInt)
+		log.Printf("无法读取和转换配置中获取NOTION数据的时间，使用降级值：%d", timeConfigInt)
 	}
 	ticker := time.NewTicker(time.Duration(timeConfigInt) * time.Second)
 	go func() {
 		for range ticker.C {
-			fmt.Printf("[获取Notion定时任务执行开始 %v]\n", time.Now())
+			log.Printf("[获取Notion定时任务执行开始 %v]\n", time.Now())
 			getUserTask()
-			fmt.Printf("[获取Notion定时任务执行完毕 %v]\n", time.Now())
+			log.Printf("[获取Notion定时任务执行完毕 %v]\n", time.Now())
 		}
 	}()
 	// time.Sleep(5 * time.Second)
 	// ticker.Stop()
-	// fmt.Println("定时任务已停止")
+	// log.Println("定时任务已停止")
 }
 
 var userExeFlag = true
@@ -53,9 +55,9 @@ func GetUserTask(c *gin.Context) {
 	if userExeFlag {
 		go func() {
 			userExeFlag = false
-			fmt.Printf("[获取Notion User主动任务执行开始 %v]\n", time.Now())
+			log.Printf("[获取Notion User主动任务执行开始 %v]\n", time.Now())
 			getUserTask()
-			fmt.Printf("[获取Notion User主动任务执行完毕 %v]\n", time.Now())
+			log.Printf("[获取Notion User主动任务执行完毕 %v]\n", time.Now())
 			userExeFlag = true
 		}()
 		gohelper_server.Success(c, "执行成功")
@@ -77,15 +79,15 @@ func getUserTask() {
 		nil,
 		"")
 	if err != nil {
-		fmt.Printf("请求NOTION失败: %v", err)
+		log.Printf("请求NOTION失败: %v", err)
 		return
 	}
 
-	fmt.Printf("请求NOTION成功: %s", notionDatabasesUrl)
+	log.Printf("请求NOTION成功: %s", notionDatabasesUrl)
 	response := timerModel.Result{}
 	err = json.Unmarshal([]byte(getNotionResult), &response)
 	if err != nil {
-		fmt.Printf("解析NOTION结果失败: %v", err)
+		log.Printf("解析NOTION结果失败: %v", err)
 		return
 	}
 
@@ -145,6 +147,15 @@ func getUserTask() {
 		//	siteUpdated, _ := pkg.PubDateTimeConvert(atomResult.Updated)
 		//	userObj.UpdateTime = siteUpdated
 		//}
+
+		// 设置字符编码转换器
+		encoder := unicode.UTF8.NewEncoder()
+		// 进行字符编码转换
+		encodedUsername, err := encoder.String(userObj.UserName)
+		if err != nil {
+			log.Println("Failed to encode string:", err)
+		}
+		userObj.UserName = encodedUsername
 
 		if getUser.Id != 0 { //存在
 			if result.Properties.UpdateTime.LastEditedTime.After(getUser.UpdateTime) {

@@ -1,9 +1,9 @@
 package pkg
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 )
@@ -23,7 +23,7 @@ func HttpRequestRss(url string) ([]byte, error) {
 	defer resp.Body.Close()
 	response, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("读取响应内容失败:", err)
+		log.Println("读取响应内容失败:", err)
 		return nil, err
 	}
 
@@ -45,7 +45,7 @@ func HttpRequest(url string, body io.Reader) ([]byte, error) {
 	defer resp.Body.Close()
 	response, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("读取响应内容失败:", err)
+		log.Println("读取响应内容失败:", err)
 		return nil, err
 	}
 
@@ -65,7 +65,7 @@ func HttpRequestWithHeader(url string, body io.Reader, header http.Header) ([]by
 	defer resp.Body.Close()
 	response, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("读取响应内容失败:", err)
+		log.Println("读取响应内容失败:", err)
 		return nil, err
 	}
 

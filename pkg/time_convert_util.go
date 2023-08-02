@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"fmt"
+	"log"
 	"strings"
 	"time"
 )
@@ -45,7 +45,7 @@ func PubDateTimeConvert(timeStr string) (time.Time, error) {
 	}
 
 	if err != nil {
-		fmt.Printf("解析日期时间字符串 %s 失败：%s\n", timeStr, err)
+		log.Printf("解析日期时间字符串 %s 失败：%s\n", timeStr, err)
 		return t, err
 	}
 

@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"encoding/xml"
-	"fmt"
+	"log"
 	"rsshub/timer/model"
 	"time"
 )
@@ -10,7 +10,7 @@ import (
 func ParseRss(url string) (*model.Rss, *model.Feed, error) {
 	response, err := HttpRequestRss(url)
 	if err != nil {
-		fmt.Printf("%v请求RSS %s 失败 err is %v", time.Now(), url, err)
+		log.Printf("%v请求RSS %s 失败 err is %v", time.Now(), url, err)
 		return nil, nil, err
 	}
 	if rssResult, err := rss(response); err != nil || rssResult.Channel.Title == "" {
@@ -32,7 +32,7 @@ func ParseRss(url string) (*model.Rss, *model.Feed, error) {
 //		"")
 //	//resp, err := http.Get(url)
 //	if err != nil {
-//		fmt.Println("请求RSS失败:", err)
+//		log.Println("请求RSS失败:", err)
 //		return nil, nil, err
 //	}
 //	//defer func(Body io.ReadCloser) {
@@ -45,7 +45,7 @@ func ParseRss(url string) (*model.Rss, *model.Feed, error) {
 //	// 读取HTTP响应的内容
 //	//body, err := ioutil.ReadAll(resp.Body)
 //	if err != nil {
-//		fmt.Println("读取响应内容失败:", err)
+//		log.Println("读取响应内容失败:", err)
 //		return nil, nil, err
 //	}
 //
@@ -65,7 +65,7 @@ func atom(body []byte) (*model.Feed, error) {
 	var feed model.Feed
 	err := xml.Unmarshal(body, &feed)
 	if err != nil {
-		fmt.Println("解析 XML 失败:", err)
+		log.Println("解析 XML 失败:", err)
 		return nil, err
 	}
 	return &feed, nil
@@ -76,7 +76,7 @@ func rss(body []byte) (*model.Rss, error) {
 	var rssResult model.Rss
 	err := xml.Unmarshal(body, &rssResult)
 	if err != nil {
-		fmt.Println("解析RSS失败:", err)
+		log.Println("解析RSS失败:", err)
 		return nil, err
 	}
 	return &rssResult, nil
