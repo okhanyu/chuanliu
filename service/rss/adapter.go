@@ -66,8 +66,8 @@ func DaoRecentObjectToServiceRecentObjectBatch(req []daoModel.UserRecentArticle)
 			UserName: re.UserName,
 			UserId:   re.UserId,
 			//CreateTimeShow: re.CreateTime.Format("2006-01-02 15:04:05"),
-			PubDate:    re.PubDateTime,
-			MinPubDate: re.MinPubDateTime,
+			PubDate: re.PubDateTime,
+			//MinPubDate: re.MinPubDateTime,
 			//CreateTimeShow: time.Unix(re.CreateTime, 0).Format("2006-01-02 15:04:05"),
 
 		})

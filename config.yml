@@ -1,7 +1,8 @@
 notion:
   token:
   version: 2022-06-28
-  databases_url:
+  databases_url: https://api.notion.com/v1/databases/2fec78f26b59444aaf93ca71c8e62367/query
+  memos_databases_url: https://api.notion.com/v1/databases/60e865cd74974ba9b6ed7b59c8979671/query
 
 system:
   rss_get_timer: 1800

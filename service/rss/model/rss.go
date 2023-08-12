@@ -40,13 +40,13 @@ type GetRss struct {
 }
 
 type UserRecentArticle struct {
-	Id             int
-	UserId         int
-	UserName       string
-	Title          string
-	Link           string
-	PubDate        time.Time
-	PubDateShow    string
-	MinPubDate     time.Time
-	MinPubDateShow string
+	Id          int
+	UserId      int
+	UserName    string
+	Title       string
+	Link        string
+	PubDate     time.Time
+	PubDateShow string
+	//MinPubDate     time.Time
+	//MinPubDateShow string
 }

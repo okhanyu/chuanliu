@@ -178,14 +178,21 @@ func AddRss(param model.Rss) error {
 func GetUserRecentArticleListByGroup(_ *gin.Context, param model.GetRssListReq) ([]model.UserRecentArticle, error) {
 	var userList []model.UserRecentArticle
 
-	sql := fmt.Sprintf("SELECT id,%s.user_id,user_name,title,link, %s.pub_date_time,"+
-		"min_pub_date_time  FROM %s LEFT JOIN ( SELECT t.user_id, "+
-		"( SELECT pub_date_time FROM %s WHERE user_id = t."+
-		"user_id ORDER BY pub_date_time DESC LIMIT 1 OFFSET 2 ) AS min_pub_date_time FROM ("+
-		"SELECT user_id AS user_id  FROM %s GROUP BY user_id "+
-		") AS t ) AS jt ON jt.user_id = %s.user_id where %s.pub_date_time >= jt.min_pub_date_time  and %s.del != 1",
-		cons.TableRss, cons.TableRss, cons.TableRss, cons.TableRss, cons.TableRss,
-		cons.TableRss, cons.TableRss, cons.TableRss)
+	//sql := fmt.Sprintf("SELECT id,%s.user_id,user_name,title,link, %s.pub_date_time,"+
+	//	"min_pub_date_time  FROM %s LEFT JOIN ( SELECT t.user_id, "+
+	//	"( SELECT pub_date_time FROM %s WHERE user_id = t."+
+	//	"user_id ORDER BY pub_date_time DESC LIMIT 1 OFFSET 2 ) AS min_pub_date_time FROM ("+
+	//	"SELECT user_id AS user_id  FROM %s GROUP BY user_id "+
+	//	") AS t ) AS jt ON jt.user_id = %s.user_id where %s.pub_date_time >= jt.min_pub_date_time  and %s.del != 1",
+	//	cons.TableRss, cons.TableRss, cons.TableRss, cons.TableRss, cons.TableRss,
+	//	cons.TableRss, cons.TableRss, cons.TableRss)
+
+	sql := fmt.Sprintf("SELECT subquery.`id`,subquery.`user_id`,subquery.`title`,subquery.`link`,"+
+		"subquery.`pub_date_time`, user.user_name as `user_name` FROM ( SELECT *, "+
+		"ROW_NUMBER() OVER ( PARTITION BY user_id ORDER BY pub_date_time desc ) AS row_num FROM %s WHERE del = 0 "+
+		") AS subquery LEFT JOIN %s AS user ON user.`id` = subquery.user_id and user."+
+		"del = 0 WHERE row_num <= 3 and user.del = 0", cons.TableRss, cons.TableUser)
+	//  order by  user.`sort` asc , user.`id` asc
 
 	err := GetRssDB().Raw(sql).Scan(&userList).Error
 

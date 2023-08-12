@@ -49,15 +49,15 @@ func ServiceRecentObjectToApiRecentObjectBatch(res []serviceModel.UserRecentArti
 	UserRecentArticle) {
 	for _, re := range res {
 		result = append(result, apiModel.UserRecentArticle{
-			Id:             re.Id,
-			Title:          re.Title,
-			Link:           re.Link,
-			UserName:       re.UserName,
-			PubDate:        re.PubDate,
-			MinPubDateTime: re.MinPubDate,
-			PubDateShow:    re.PubDate.Format("2006-01-02 15:04:05"),
-			MinPubDateShow: re.MinPubDate.Format("2006-01-02 15:04:05"),
-			UserId:         re.UserId,
+			Id:       re.Id,
+			Title:    re.Title,
+			Link:     re.Link,
+			UserName: re.UserName,
+			PubDate:  re.PubDate,
+			//MinPubDateTime: re.MinPubDate,
+			PubDateShow: re.PubDate.Format("2006-01-02 15:04:05"),
+			//MinPubDateShow: re.MinPubDate.Format("2006-01-02 15:04:05"),
+			UserId: re.UserId,
 			//CreateTimeShow: time.Unix(re.CreateTime, 0).Format("2006-01-02 15:04:05"),
 		})
 
