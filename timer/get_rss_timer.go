@@ -32,7 +32,7 @@ func GetRssTimer() {
 	go func() {
 		for range ticker.C {
 			log.Printf("[获取Rss定时任务执行开始 %v]\n", time.Now())
-			rssTask()
+			rssTask("")
 			log.Printf("[获取Rss定时任务执行完毕 %v]\n", time.Now())
 		}
 	}()
@@ -44,11 +44,13 @@ func GetRssTimer() {
 var rssExeFlag = true
 
 func RssTask(c *gin.Context) {
+
 	if rssExeFlag {
 		go func() {
 			rssExeFlag = false
 			log.Printf("[获取Rss主动任务执行开始 %v]\n", time.Now())
-			rssTask()
+			link := c.Query("link")
+			rssTask(link)
 			log.Printf("[获取Rss主动任务执行完毕 %v]\n", time.Now())
 			rssExeFlag = true
 		}()
@@ -58,10 +60,20 @@ func RssTask(c *gin.Context) {
 	}
 }
 
-func rssTask() {
-	userList, err := userDao.GetUserList()
-	if err != nil {
-		return
+func rssTask(link string) {
+	var userList []userModel.User
+	if link == "" {
+		userLists, err := userDao.GetUserList()
+		if err != nil {
+			return
+		}
+		userList = userLists
+	} else {
+		user, err := userDao.GetUserByRssLink(userModel.GetUserReq{RssLink: link})
+		if err != nil {
+			return
+		}
+		userList = []userModel.User{0: user}
 	}
 
 	for _, userObj := range userList {
@@ -199,7 +211,18 @@ func eachAtom(atomResult *model.Feed, userObj userModel.User) []rssModel.Rss {
 		if item.Published == "" {
 			item.Published = item.Updated
 		}
-		pubDate, _ := pkg.PubDateTimeConvert(item.Published)
+		pubDate := time.Now()
+		if item.Published != "" {
+			pubDate, _ = pkg.PubDateTimeConvert(item.Published)
+		}
+		if item.Published == "" && item.Updated != "" {
+			pubDate, _ = pkg.PubDateTimeConvert(item.Updated)
+		}
+
+		if strings.Contains(pubDate.String(), "0000-00-00") {
+			pubDate = time.Now()
+		}
+
 		image := getAtomImg(item)
 
 		if len(item.Content.Value) > LenContent {

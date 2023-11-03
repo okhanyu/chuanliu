@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"github.com/glebarez/sqlite"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -66,6 +67,12 @@ func initMySQL(dsn string) {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("无法连接到数据库")
+	}
+	db = db.Exec("SET GLOBAL character_set_server= 'utf8mb4'")
+	db = db.Exec("SET GLOBAL character_set_database = 'utf8mb4'")
+	if err != nil {
+		fmt.Println("修改character_set_system设置失败:", err)
+		return
 	}
 	sqlDB, err := db.DB()
 	if err != nil {

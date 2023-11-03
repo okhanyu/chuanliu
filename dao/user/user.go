@@ -7,6 +7,7 @@ import (
 	"rsshub/dao/cons"
 	"rsshub/dao/db"
 	"rsshub/dao/user/model"
+	"rsshub/pkg"
 	"time"
 )
 
@@ -46,6 +47,9 @@ func GetUserListByGroup(param model.GetListReq) ([]model.UserStatistics, error) 
 	if param.Order == 3 {
 		order = " `like` desc "
 	}
+	if param.Order == 4 {
+		order = " rand() "
+	}
 	err := GetUserDB().Model(&userList).Select(selectField).Joins(join).Where(where).
 		Order(order).Group(group).Offset(param.PageNum * param.
 		PageSize).Limit(param.PageSize).Find(&userList).Error
@@ -72,6 +76,9 @@ func AddUser(param model.User) error {
 	//		tx.Commit()
 	//	}
 	//}
+
+	param.UserName = pkg.HandleUTF8(param.UserName)
+
 	tx := GetUserDBWithTx()
 	err := tx.Model(&param).Create(&param).Error
 	if err != nil {

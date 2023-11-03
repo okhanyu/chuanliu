@@ -10,6 +10,7 @@ import (
 	"rsshub/dao/cons"
 	"rsshub/dao/db"
 	"rsshub/dao/rss/model"
+	"rsshub/pkg"
 	"strconv"
 	"strings"
 	"time"
@@ -147,6 +148,10 @@ func AddRss(param model.Rss) error {
 
 		SELECT
 	*/
+	param.Summary = pkg.HandleUTF8(param.Summary)
+	param.Content = pkg.HandleUTF8(param.Content)
+	param.UserName = pkg.HandleUTF8(param.UserName)
+
 	var rssObj model.Rss
 	param.Link = strings.TrimSpace(param.Link)
 	err := GetRssDB().Model(&rssObj).Where(" substr(link, instr(link, "+
